@@ -115,6 +115,28 @@ static int local_tzoffset(timestamp_t time)
 	return local_time_tzoffset((time_t)time, &tm);
 }
 
+const struct timeval *test_time = 0;
+void show_date_human(timestamp_t time, int tz,
+			       const struct timeval *now,
+			       struct strbuf *timebuf)
+{
+	test_time = (const struct timeval *) now;
+	strbuf_addstr( timebuf, show_date(time, tz, DATE_MODE(HUMAN)));
+	test_time = (const struct timeval *) 0;
+}
+
+static void get_time(struct timeval *now)
+{
+	if(test_time != 0)
+		/*
+		 * If show_date was called via the test
+		 *  interface use the test_tool time
+		 */
+		*now = *test_time;
+	else
+		gettimeofday(now, NULL);
+}
+
 void show_date_relative(timestamp_t time, int tz,
 			       const struct timeval *now,
 			       struct strbuf *timebuf)
@@ -228,7 +250,7 @@ static void show_date_normal(struct strbuf *buf, timestamp_t time, struct tm *tm
 	/* Show "today" times as just relative times */
 	if (hide.wday) {
 		struct timeval now;
-		gettimeofday(&now, NULL);
+		get_time(&now);
 		show_date_relative(time, tz, &now, buf);
 		return;
 	}
@@ -284,7 +306,7 @@ const char *show_date(timestamp_t time, int tz, const struct date_mode *mode)
 	if (mode->type == DATE_HUMAN) {
 		struct timeval now;
 
-		gettimeofday(&now, NULL);
+		get_time(&now);
 
 		/* Fill in the data for "current time" in human_tz and human_tm */
 		human_tz = local_time_tzoffset(now.tv_sec, &human_tm);
