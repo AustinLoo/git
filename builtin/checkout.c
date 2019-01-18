@@ -562,6 +562,12 @@ static int skip_merge_working_tree(const struct checkout_opts *opts,
 		return 0;
 
 	/*
+	 * We must do the merge if this is the initial checkout
+	 */
+	if (is_cache_unborn())
+		return 0;
+
+	/*
 	 * We must do the merge if we are actually moving to a new commit.
 	 */
 	if (!old_branch_info->commit || !new_branch_info->commit ||
