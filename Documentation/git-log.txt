@@ -193,6 +193,10 @@ log.date::
 	`--date` option.)  Defaults to "default", which means to write
 	dates like `Sat May 8 19:35:34 2010 -0500`.
 
+	If the format is set to "auto:foo", then if the pager is in
+	use format "foo" will be the used for the date format, otherwise
+	"default" will be used.
+
 log.follow::
 	If `true`, `git log` will act as if the `--follow` option was used when
 	a single <path> is given.  This has the same limitations as `--follow`,
